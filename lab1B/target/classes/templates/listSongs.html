@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+  <meta charset="utf-8">
+  <title>Songs Homepage - Welcome to My Music Store</title>
+  <style type="text/css">
+    body {
+      width: 800px;
+      margin: auto;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Welcome to My Music Store</h1>
+</header>
+<main>
+</main>
+    <h2>Filter Songs by Album:</h2>
+    <form th:action="@{/songs}" method="get">
+        <label for="albumSelect">Choose an Album:</label>
+        <select id="albumSelect" name="albumId">
+            <!-- 'All Albums' option for resetting the filter -->
+            <option th:value="null" th:text="'All Albums'" selected="selected">All Albums</option>
+            <option th:each="album : ${albums}" th:value="${album.id}" th:text="${album.name}"></option>
+        </select>
+        <button type="submit">Filter</button>
+    </form>
+
+  <h2>Choose a song:</h2>
+  <!-- Display radio buttons for each song,
+          the value should be the trackId
+          and the displayed text should be Title: <songTitle>, Genre:<genre>, Release Year: <releaseYear> -->
+<!--  <input type="radio" name="trackId" value="1"> Song 1 <br/>-->
+<!--  <input type="radio" name="trackId" value="2"> Song 2<br/>-->
+<!--  <input type="radio" name="trackId" value="3"> Song 3 <br/>-->
+<!--  <form th:method="get" th:action="listSongs">-->
+<!--    <label>Category:</label>-->
+<!--    <input type="text" name="category">-->
+<!--    <input type="submit" value="Sumbit">-->
+<!--  </form>-->
+
+<!--  <ul>-->
+<!--    <li th:each="category: ${categories}">-->
+<!--      <label>-->
+<!--        Name: <span th:text="${category.getTitle()}"></span>,-->
+<!--        Release year: <span th:text="${category.releaseYear}"></span>,-->
+<!--        Category: <span th:text="${category.category}"></span>-->
+<!--      </label>-->
+
+<!--    </li>-->
+<!--  </ul>-->
+
+<!--  <form action="/artist" method="post">-->
+    <div th:each="song : ${songs}">
+<!--      <input type="radio" name="trackId" th:value="${song.trackId}"-->
+<!--             th:id="${'song-' + song.trackId}" />-->
+      <label th:for="${'song-' + song.trackId}">
+        <br>
+        Title: <span th:text="${song.title}"></span><br>
+        Genre: <span th:text="${song.genre}"></span><br>
+<!--        Category: <span th:text="${song.getCategory().name}"></span><br>-->
+        Release Year: <span th:text="${song.releaseYear}"></span><br>
+        Album: <span th:text="${song.getAlbum().name}"></span><br>
+<!--        Artists : <span th:text="${song.performers}"></span>-->
+        Artists:
+        <span>
+                <span th:each="artist : ${song.performers}">
+                    <span th:text="'-' + ${artist.firstName} + ' ' + ${artist.lastName}"></span>
+                </span>
+            </span>
+          <br>
+<!--          Reviews:-->
+<!--          <span>-->
+<!--                <span th:each="review : ${song.reviews}">-->
+<!--                    <span th:text="'-Comment:' + ${review.comment} + ' Rating:' + ${review.rating}"></span>-->
+<!--                </span>-->
+<!--            </span>-->
+      </label>
+      <br/>
+<!--      <form th:action="@{/songs/delete}" method="post">-->
+<!--       <input type="hidden" name="songId" th:value="${song.id}" />-->
+        <th:block sec:authorize="hasRole('ROLE_ADMIN')">
+      <form th:action="@{/songs/delete/{id}(id=${song.id})}" method="post" >
+        <button type="submit">
+<!--          <input type="hidden" name="songId" th:value="${song.id}" />-->
+          Delete
+        </button>
+      </form>
+
+      <form th:action="@{/songs/edit-form/{id}(id=${song.id})}" method="get" >
+      <button type="submit">
+        Edit
+      </button>
+      </form>
+<!--      </form>-->
+<!--        <form th:action="@{/songs/review/{id}(id=${song.id})}" method="get" >-->
+<!--            <button type="submit">-->
+<!--                Review-->
+<!--            </button>-->
+<!--        </form>-->
+<!--    </div>-->
+<!--    <button type="submit" >Submit</button>-->
+  </ul>
+        </th:block>
+    </div>
+
+
+  <form action="/artist" method="post">
+    <label for="songSelect">Choose a song to add artist:</label>
+    <select name="trackId" id="songSelect" required>
+      <option value="" disabled selected>Select a song</option>
+      <option th:each="song : ${songs}"
+              th:value="${song.trackId}"
+              th:text="${song.title}"></option>
+    </select>
+    <br><br>
+    <button type="submit">Submit</button>
+  </form>
+
+
+<div class="center-button">
+    <a href="/songs/add" method="get" class="button">Add New Song</a>
+</div>
+
+<div th:if="${hasError}" class="alert alert-danger">
+    <p th:text="${error}"></p>
+</div>
+</body>
+</html>
